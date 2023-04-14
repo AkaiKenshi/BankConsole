@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -34,8 +35,8 @@ public class Customer
         };
 
         var response = await client.SendAsync(request);
-        var result = bool.Parse(await response.Content.ReadAsStringAsync());
-        return result;
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<bool>();
     }
 
     public async static Task<bool> IsValidPassword(string userName, string password)
@@ -52,6 +53,20 @@ public class Customer
         return result;
     }
 
+    public async static Task<string> GetIdByUsername(string userName)
+    {
+        using var client = new HttpClient();
+        var request = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"http://localhost:5185/api/customers/GetIdByUserName/{userName}"),
+            Method = HttpMethod.Get
+        };
+
+        var response = await client.SendAsync(request);
+        var result =await response.Content.ReadAsStringAsync();
+        return result;
+    }
+
     public static bool ValidatePassword(string password) => true;
 
     public async static Task CreateCustomer(string customer_id, string customer_user_name, string customer_name, string customer_last_name, string customer_password)
@@ -64,7 +79,7 @@ public class Customer
         {
             RequestUri = new Uri($"http://localhost:5185/api/customers/"),
             Method = HttpMethod.Post
-        }; 
+        };
 
         var bodyString = JsonConvert.SerializeObject(customer);
         var content = new StringContent(bodyString, Encoding.UTF8, "application/json");
