@@ -1,4 +1,6 @@
-﻿namespace ConsoleOptions;
+﻿using System.Security.Cryptography.X509Certificates;
+
+namespace ConsoleOptions;
 
 public static class OptionHelper
 {
@@ -12,22 +14,9 @@ public static class OptionHelper
         Console.WriteLine(initialPrompt);
 
         for (int i = 1; i <= options.Length; i++) Console.WriteLine("   " + i + ": " + options[i - 1].Prompt);
-        SelectAcctionCommand(options);
 
-        static void SelectAcctionCommand(ActionCommand[] options)
-        {
-            try
-            {
-                var userInput = Console.ReadLine() ?? throw new NullReferenceException();
-                var optionSelected = int.Parse(userInput);
-                options[optionSelected - 1].RunCommand();
-            }
-            catch (Exception e) when (e is NullReferenceException || e is FormatException || e is IndexOutOfRangeException)
-            {
-                Console.WriteLine("please select a valid option");
-                SelectAcctionCommand(options);
-            }
-        }
+        var userInput = GetUserSelection(options.Length); 
+        options[userInput - 1].RunCommand();
 
     }
 
@@ -41,22 +30,21 @@ public static class OptionHelper
         Console.WriteLine(initialPrompt);
 
         for (int i = 1; i <= options.Length; i++) Console.WriteLine("   " + i + ": " + options[i - 1].Prompt);
-        return SelectFuncCommand(options);
 
-        static T SelectFuncCommand(FuncCommand<T>[] options)
+        var userInput = GetUserSelection(options.Length);
+        return options[userInput - 1].RunCommand();
+
+    }
+
+    private static int GetUserSelection(int lenghtOption)
+    {
+        var userInput = Console.ReadLine();
+        var numericUserInput = 0;
+        if (userInput == null || !int.TryParse(userInput, out numericUserInput) || numericUserInput > lenghtOption || numericUserInput <= 0)
         {
-            try
-            {
-                var userInput = Console.ReadLine() ?? throw new NullReferenceException();
-                var optionSelected = int.Parse(userInput);
-                return options[optionSelected - 1].RunCommand();
-            }
-            catch (Exception e) when (e is NullReferenceException || e is FormatException || e is IndexOutOfRangeException)
-            {
-                Console.WriteLine("please select a valid option");
-                return SelectFuncCommand(options);
-            }
+            Console.WriteLine("Please Select a valid Option");
+            return GetUserSelection(numericUserInput);
         }
-
+        return numericUserInput;
     }
 }

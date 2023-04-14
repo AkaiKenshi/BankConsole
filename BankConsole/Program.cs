@@ -29,7 +29,7 @@ internal class Program
 
         if (!ValidateUserPassword(username))
         {
-            //TODO handle Invalid Password
+            Console.WriteLine("Returning to Start"); 
             return;
         }
         //TODO handle Login Request
@@ -48,6 +48,7 @@ internal class Program
         var password = GetValidPassword();
 
         Customer.CreateCustomer(id, username, name, lastName, password).GetAwaiter().GetResult(); 
+        //TODO access bank accounts 
     }
 
 
