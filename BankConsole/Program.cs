@@ -32,6 +32,7 @@ internal class Program
             Console.WriteLine("Returning to Start"); 
             return;
         }
+        
         //TODO handle Login Request
     }
     private static void CreateUserAccount()
