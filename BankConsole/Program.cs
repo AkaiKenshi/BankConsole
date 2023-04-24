@@ -31,7 +31,7 @@ internal class Program
     private static void CreateUserAccount()
     {
         Console.WriteLine("Please Input your ID");
-        //var id = GetAvailableID();
+        var id = GetAvailableId();
         Console.WriteLine("Please Input your user name");
         //var username = GetAvailableUserName();
         Console.WriteLine("Please Input your name");
@@ -68,5 +68,21 @@ internal class Program
         throw new NotImplementedException();
     }
 
+    #region HelperFunctions
 
+    private static string GetAvailableId()
+    {
+        Console.Write("Write your Id: ");
+        var userInput = Console.ReadLine();
+        
+        if (userInput == null || userInput.Length != 10 || !int.TryParse(userInput, out _))
+        {
+            Console.WriteLine("Invalid id, Try Again"); 
+            return GetAvailableId();
+        }
+
+        return userInput;
+    }
+
+    #endregion
 }
