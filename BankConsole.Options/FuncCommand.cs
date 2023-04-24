@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConsoleOptions;
+namespace BankConsole.Options;
 public readonly struct FuncCommand<T>
 {
     private readonly Func<T> onSelected;

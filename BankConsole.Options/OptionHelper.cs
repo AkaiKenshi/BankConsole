@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 
-namespace ConsoleOptions;
+namespace BankConsole.Options;
 
 public static class OptionHelper
 {
@@ -15,7 +15,7 @@ public static class OptionHelper
 
         for (int i = 1; i <= options.Length; i++) Console.WriteLine("   " + i + ": " + options[i - 1].Prompt);
 
-        var userInput = GetUserSelection(options.Length); 
+        var userInput = GetUserSelection(options.Length);
         options[userInput - 1].RunCommand();
 
     }

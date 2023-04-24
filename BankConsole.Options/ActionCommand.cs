@@ -1,4 +1,4 @@
-﻿namespace ConsoleOptions;
+﻿namespace BankConsole.Options;
 public readonly struct ActionCommand
 {
     private readonly Action onSelected;
