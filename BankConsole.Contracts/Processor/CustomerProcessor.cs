@@ -113,7 +113,7 @@ namespace BankConsole.Contracts.Processor
             }
         }
 
-        public async Task DeleteCustomer(string id)
+        public async Task DeleteCustomer(string token)
         {
             var url = $"/api/Customer"; 
 
