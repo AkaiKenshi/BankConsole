@@ -1,4 +1,5 @@
 ﻿
+using BankConsole.Contracts;
 using BankConsole.Options;
 
 namespace BankConsole;
@@ -7,6 +8,7 @@ internal class Program
 {
     private static void Main(string[] args)
     {
+        ApiHelper.InnitalizeClient();
         bool KeepRunningApp = true;
         while (KeepRunningApp)
         {
@@ -26,7 +28,7 @@ internal class Program
 
         Console.WriteLine("Returning to Start");
 
-    }
+        }
 
     private static void CreateUserAccount()
     {
@@ -56,7 +58,7 @@ internal class Program
                 new ActionCommand("Access Bank Account", () => AccessBankAccount(id)),
                 new ActionCommand("Go back", () => KeepRunning = false));
         }
-    }
+    } 
 
     private static void CreateUserAccount(string id)
     {
