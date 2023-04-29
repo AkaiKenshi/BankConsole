@@ -1,12 +1,7 @@
 ﻿using BankConsole.Contracts.DTOs.Customers;
 using BankConsole.Contracts.Models;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BankConsole.Contracts.Processor
 {
@@ -16,32 +11,23 @@ namespace BankConsole.Contracts.Processor
         {
             var url = $"/api/Customer/isCustomerIdAvailable/{id}";
             using HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url);
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new WebException(response.ReasonPhrase);
-            }
+            response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsAsync<bool>();
         }
 
         public async Task<bool> IsCustomerUsernameAvailable(string username)
         {
             var url = $"/api/Customer/isCustomerUsernameAvailable/{username}";
-            using HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url); 
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new WebException(response.ReasonPhrase);
-            }
+            using HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsAsync<bool>();
         }
 
         public async Task<bool> IsCustomerEmailAvailable(string email)
         {
-            var url = $"/api/Customer/isCustomerEmailAvailable/{email}"; 
+            var url = $"/api/Customer/isCustomerEmailAvailable/{email}";
             using HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url);
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new WebException(response.ReasonPhrase);  
-            }
+            response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsAsync<bool>();
         }
 
@@ -49,11 +35,8 @@ namespace BankConsole.Contracts.Processor
         {
             var url = "/api/Customer/Register";
 
-            using HttpResponseMessage response = await ApiHelper.ApiClient.PostAsJsonAsync(url, createRequest); 
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new WebException(response.ReasonPhrase);
-            }
+            using HttpResponseMessage response = await ApiHelper.ApiClient.PostAsJsonAsync(url, createRequest);
+            response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsAsync<Customer>();
         }
 
@@ -61,67 +44,68 @@ namespace BankConsole.Contracts.Processor
         {
             var url = "/api/Customer/Login";
 
-            using HttpResponseMessage response = await ApiHelper.ApiClient.PostAsJsonAsync(url, loginRequest); 
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new WebException(response.ReasonPhrase);
-            }
+            using HttpResponseMessage response = await ApiHelper.ApiClient.PostAsJsonAsync(url, loginRequest);
+            response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsAsync<Customer>();
         }
 
-        public async Task UpdateCustomerInformation(UpdateCustomerInformationRequestDTO updateRequest)
+        public async Task UpdateCustomerInformation(UpdateCustomerInformationRequestDTO updateRequest, string token)
         {
-            var url = "/api/Customer/UpdateCustomerInformation"; 
+            var uri = new Uri("/api/Customer/UpdateCustomerInformation");
+            var content = new StringContent(JsonConvert.SerializeObject(updateRequest), Encoding.UTF8, "application/json");
+            var request = new HttpRequestMessage(HttpMethod.Put, uri);
+            request.Headers.Add("Authorization", $"bearer {token}");
+            request.Content = content;
 
-            using HttpResponseMessage response = await ApiHelper.ApiClient.PutAsJsonAsync(url, updateRequest);
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new WebException(response.ReasonPhrase);
-            }
-        }
-        
-        public async Task UpdateCustomerUsername(UpdateCustomerUsernameRequestDTO updateRequest)
-        {
-            var url = "/api/Customer/UpdateCustomerInformation"; 
+            using HttpResponseMessage response = await ApiHelper.ApiClient.SendAsync(request);
 
-            using HttpResponseMessage response = await ApiHelper.ApiClient.PutAsJsonAsync(url, updateRequest);
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new WebException(response.ReasonPhrase);
-            }
+            response.EnsureSuccessStatusCode();
         }
 
-        public async Task UpdateCustomerEmail(UpdateCustomerEmailRequestDTO updateRequest)
+        public async Task UpdateCustomerUsername(UpdateCustomerUsernameRequestDTO updateRequest, string token)
         {
-            var url = "/api/Customer/UpdateCustomerInformation"; 
+            var uri = new Uri("/api/Customer/UpdateCustomerInformation");
+            var content = new StringContent(JsonConvert.SerializeObject(updateRequest), Encoding.UTF8, "application/json");
+            var request = new HttpRequestMessage(HttpMethod.Put, uri);
+            request.Headers.Add("Authorization", $"bearer {token}");
+            request.Content = content;
 
-            using HttpResponseMessage response = await ApiHelper.ApiClient.PutAsJsonAsync(url, updateRequest);
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new WebException(response.ReasonPhrase);
-            }
+            using HttpResponseMessage response = await ApiHelper.ApiClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
         }
-        
-        public async Task UpdateCustomerPassword(UpdateCustomerPasswordRequestDTO updateRequest)
-        {
-            var url = "/api/Customer/UpdateCustomerInformation"; 
 
-            using HttpResponseMessage response = await ApiHelper.ApiClient.PutAsJsonAsync(url, updateRequest);
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new WebException(response.ReasonPhrase);
-            }
+        public async Task UpdateCustomerEmail(UpdateCustomerEmailRequestDTO updateRequest, string token)
+        {
+            var uri = new Uri("/api/Customer/UpdateCustomerInformation");
+            var content = new StringContent(JsonConvert.SerializeObject(updateRequest), Encoding.UTF8, "application/json");
+            var request = new HttpRequestMessage(HttpMethod.Put, uri);
+            request.Headers.Add("Authorization", $"bearer {token}");
+            request.Content = content;
+
+            using HttpResponseMessage response = await ApiHelper.ApiClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task UpdateCustomerPassword(UpdateCustomerPasswordRequestDTO updateRequest, string token)
+        {
+            var uri = new Uri("/api/Customer/UpdateCustomerInformation");
+            var content = new StringContent(JsonConvert.SerializeObject(updateRequest), Encoding.UTF8, "application/json");
+            var request = new HttpRequestMessage(HttpMethod.Put, uri);
+            request.Headers.Add("Authorization", $"bearer {token}");
+            request.Content = content;
+
+            using HttpResponseMessage response = await ApiHelper.ApiClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
         }
 
         public async Task DeleteCustomer(string token)
         {
-            var url = $"/api/Customer"; 
+            var uri = new Uri($"/api/Customer");
+            var request = new HttpRequestMessage(HttpMethod.Delete, uri);
+            request.Headers.Add("Authorization", $"bearer {token}");
 
-            using HttpResponseMessage response = await ApiHelper.ApiClient.DeleteAsync(url);
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new WebException(response.ReasonPhrase);
-            }
+            using HttpResponseMessage response = await ApiHelper.ApiClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
         }
 
     }
