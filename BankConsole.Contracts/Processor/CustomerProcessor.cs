@@ -5,9 +5,9 @@ using System.Text;
 
 namespace BankConsole.Contracts.Processor
 {
-    public class CustomerProcessor
+    public static class CustomerProcessor
     {
-        public async Task<bool> IsCustomerIdAvailable(string id)
+        public static async Task<bool> IsCustomerIdAvailableAsync(string id)
         {
             var url = $"/api/Customer/isCustomerIdAvailable/{id}";
             using HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url);
@@ -15,7 +15,7 @@ namespace BankConsole.Contracts.Processor
             return await response.Content.ReadAsAsync<bool>();
         }
 
-        public async Task<bool> IsCustomerUsernameAvailable(string username)
+        public static async Task<bool> IsCustomerUsernameAvailableAsync(string username)
         {
             var url = $"/api/Customer/isCustomerUsernameAvailable/{username}";
             using HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url);
@@ -23,7 +23,7 @@ namespace BankConsole.Contracts.Processor
             return await response.Content.ReadAsAsync<bool>();
         }
 
-        public async Task<bool> IsCustomerEmailAvailable(string email)
+        public static async Task<bool> IsCustomerEmailAvailableAsync(string email)
         {
             var url = $"/api/Customer/isCustomerEmailAvailable/{email}";
             using HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url);
@@ -31,7 +31,7 @@ namespace BankConsole.Contracts.Processor
             return await response.Content.ReadAsAsync<bool>();
         }
 
-        public async Task<Customer> RegisterUser(CreateCustomerRequestDTO createRequest)
+        public static async Task<Customer> RegisterUserAsync(CreateCustomerRequestDTO createRequest)
         {
             var url = "/api/Customer/Register";
 
@@ -40,7 +40,7 @@ namespace BankConsole.Contracts.Processor
             return await response.Content.ReadAsAsync<Customer>();
         }
 
-        public async Task<Customer> LoginUser(GetCustomerLoginRequestDTO loginRequest)
+        public static async Task<Customer> LoginUserAsync(GetCustomerLoginRequestDTO loginRequest)
         {
             var url = "/api/Customer/Login";
 
@@ -49,7 +49,7 @@ namespace BankConsole.Contracts.Processor
             return await response.Content.ReadAsAsync<Customer>();
         }
 
-        public async Task UpdateCustomerInformation(UpdateCustomerInformationRequestDTO updateRequest, string token)
+        public static async Task UpdateCustomerInformationAsync(UpdateCustomerInformationRequestDTO updateRequest, string token)
         {
             var uri = new Uri("/api/Customer/UpdateCustomerInformation");
             var content = new StringContent(JsonConvert.SerializeObject(updateRequest), Encoding.UTF8, "application/json");
@@ -62,7 +62,7 @@ namespace BankConsole.Contracts.Processor
             response.EnsureSuccessStatusCode();
         }
 
-        public async Task UpdateCustomerUsername(UpdateCustomerUsernameRequestDTO updateRequest, string token)
+        public static async Task UpdateCustomerUsernameAsync(UpdateCustomerUsernameRequestDTO updateRequest, string token)
         {
             var uri = new Uri("/api/Customer/UpdateCustomerInformation");
             var content = new StringContent(JsonConvert.SerializeObject(updateRequest), Encoding.UTF8, "application/json");
@@ -74,7 +74,7 @@ namespace BankConsole.Contracts.Processor
             response.EnsureSuccessStatusCode();
         }
 
-        public async Task UpdateCustomerEmail(UpdateCustomerEmailRequestDTO updateRequest, string token)
+        public static async Task UpdateCustomerEmailAsync(UpdateCustomerEmailRequestDTO updateRequest, string token)
         {
             var uri = new Uri("/api/Customer/UpdateCustomerInformation");
             var content = new StringContent(JsonConvert.SerializeObject(updateRequest), Encoding.UTF8, "application/json");
@@ -86,7 +86,7 @@ namespace BankConsole.Contracts.Processor
             response.EnsureSuccessStatusCode();
         }
 
-        public async Task UpdateCustomerPassword(UpdateCustomerPasswordRequestDTO updateRequest, string token)
+        public static async Task UpdateCustomerPasswordAsync(UpdateCustomerPasswordRequestDTO updateRequest, string token)
         {
             var uri = new Uri("/api/Customer/UpdateCustomerInformation");
             var content = new StringContent(JsonConvert.SerializeObject(updateRequest), Encoding.UTF8, "application/json");
@@ -98,7 +98,7 @@ namespace BankConsole.Contracts.Processor
             response.EnsureSuccessStatusCode();
         }
 
-        public async Task DeleteCustomer(string token)
+         static async Task DeleteCustomerAsync(string token)
         {
             var uri = new Uri($"/api/Customer");
             var request = new HttpRequestMessage(HttpMethod.Delete, uri);

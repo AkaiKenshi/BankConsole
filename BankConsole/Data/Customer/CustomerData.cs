@@ -5,7 +5,7 @@ namespace BankConsole.Data.Customer
 {
     public class CustomerData
     {
-        HttpClient _client = new HttpClient
+        readonly HttpClient _client = new()
         {
             BaseAddress = new Uri("https://localhost:7035")
         };

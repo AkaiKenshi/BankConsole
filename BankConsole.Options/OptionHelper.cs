@@ -43,7 +43,7 @@ public static class OptionHelper
         if (userInput == null || !int.TryParse(userInput, out numericUserInput) || numericUserInput > lenghtOption || numericUserInput <= 0)
         {
             Console.WriteLine("Please Select a valid Option");
-            return GetUserSelection(numericUserInput);
+            return GetUserSelection(lenghtOption);
         }
         return numericUserInput;
     }

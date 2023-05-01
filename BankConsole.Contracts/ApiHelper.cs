@@ -8,8 +8,10 @@ public static class ApiHelper
 
     public static void InnitalizeClient()
     {
-        ApiClient = new HttpClient();
-        ApiClient.BaseAddress = new Uri("https://localhost:7035/");
+        ApiClient = new HttpClient
+        {
+            BaseAddress = new Uri("https://localhost:7035/")
+        };
         ApiClient.DefaultRequestHeaders.Accept.Clear();
         ApiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }

@@ -1,4 +1,4 @@
-﻿namespace BankConsole.Contracts
+﻿namespace BankConsole.Contracts.Models
 {
     public enum AccountType
     {

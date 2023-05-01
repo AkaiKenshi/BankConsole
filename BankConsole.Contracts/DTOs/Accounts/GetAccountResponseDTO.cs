@@ -1,4 +1,6 @@
-﻿namespace BankConsole.Contracts.DTOs.Accounts;
+﻿using BankConsole.Contracts.Models;
+
+namespace BankConsole.Contracts.DTOs.Accounts;
 
 public record GetAccountResponseDTO
 (
