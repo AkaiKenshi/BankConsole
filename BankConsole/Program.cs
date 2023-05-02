@@ -143,10 +143,7 @@ internal class Program
     {
 
     }
-<<<<<<< HEAD
 
-=======
->>>>>>> 454f5aec6d2575bd9e7ec80d14a923f3efd2e991
     private static void DepositMoney(Customer customer, Account account)
     {
         try
