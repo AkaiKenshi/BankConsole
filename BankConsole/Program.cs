@@ -37,12 +37,13 @@ internal class Program
         try
         {
 
-            Console.WriteLine("Please Input your user name");
             var username = GetUserInput("write your Username: ", "Invalid Username, Try Again");
-            Console.WriteLine("Write Your Password");
             var password = GetPassword("Enter password: ");
 
             var customer = CustomerProcessor.LoginUserAsync(new GetCustomerLoginRequestDTO(username, password)).Result;
+
+            Console.WriteLine($"\nWelcome {customer.FirstName} {customer.LastName}\n");
+
             AccessAccount(customer);
         }
         catch (AggregateException ex)
@@ -55,7 +56,6 @@ internal class Program
             LogInUserAccount();
         }
     }
-
     private static void CreateUserAccount()
     {
         var id = GetAvailableId();
@@ -67,9 +67,11 @@ internal class Program
 
         var createRequest = new CreateCustomerRequestDTO(id, username, firstName, lastName, email, password);
         var customer = CustomerProcessor.RegisterUserAsync(createRequest).Result;
+
+        Console.WriteLine($"\nWelcome {customer.FirstName} {customer.LastName}\n");
+
         AccessAccount(customer);
     }
-
     private static void AccessAccount(Customer customer)
     {
         var KeepRunning = true;
@@ -82,7 +84,6 @@ internal class Program
                 new ActionCommand("Go back", () => KeepRunning = false));
         }
     }
-
     private static void CreateBankAccount(Customer customer)
     {
 
@@ -93,6 +94,7 @@ internal class Program
             new FuncCommand<Account>("Fixed Term Investment Account", () => longTermInvestmentAccount())
             );
 
+        Console.WriteLine($"\nAccount {account.Id} created with balance: {account.Balance:C}\n");
 
         Account chekingAccount()
         {
@@ -117,14 +119,15 @@ internal class Program
                 CreateAccountAsync<CreateSavingsAccountRequestDTO>(createRequest, "/api/Account/createSavingsAccount", customer.Token).Result;
         }
     }
-
-
     private static void AccessBankAccount(Customer customer)
     {
         try
         {
             var accountId = GetUserInput("Enter the account number: ", "invalid account");
             var account = AccountProcessor.GetAccountFromIdAsync(accountId, customer.Token).Result;
+
+            Console.WriteLine($"\nAccess to account {account.Id} granted, balance: {account.Balance:C}\n");
+
         }
         catch (AggregateException ex)
         {
@@ -134,6 +137,23 @@ internal class Program
             }
             Console.WriteLine("Invalid access to account");
             AccessBankAccount(customer);
+        }
+    }
+    private static void AccountActions(Customer customer, Account account)
+    {
+
+    }
+    private static void DepositMoney(Customer customer, Account account)
+    {
+        try
+        {
+            //AccountProcessor.TransactionBalanceAsync()
+        }
+        catch (AggregateException ex)
+        {
+            if (ex.InnerException is not HttpRequestException) { throw ex.InnerException!; }
+            Console.WriteLine(ex.InnerException.Message);
+
         }
     }
 
@@ -220,16 +240,22 @@ internal class Program
 
         return password;
     }
-
     public static double GetValidAmmountOfMoney(string promt, string promtOnFaliure)
     {
         if (!Double.TryParse(GetUserInput(promt, promtOnFaliure), out var result) || result < 0)
         {
+            Console.WriteLine(promtOnFaliure);
+            return GetValidAmmountOfMoney(promt, promtOnFaliure);
+        }
+        var stringResult = result.ToString();
+        int decimalPlaces = stringResult.Length - stringResult.IndexOf('.') - 1;
+        if (decimalPlaces > 2)
+        {
+            Console.WriteLine(promtOnFaliure);
             return GetValidAmmountOfMoney(promt, promtOnFaliure);
         }
         return result;
     }
-
     public static int GetValidAmmountOfTime(string promt, string promtOnFaliure)
     {
         if (!int.TryParse(GetUserInput(promt, promtOnFaliure), out var result) || result < 0)
@@ -238,7 +264,6 @@ internal class Program
         }
         return result;
     }
-
     private static string GetValidPassword()
     {
         string pattern = @"^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$";
@@ -247,7 +272,7 @@ internal class Program
         if (!Regex.IsMatch(password, pattern))
         {
             Console.WriteLine($"Password not strong enough. " +
-                $"\nit needs at least 1 uppercase letter, 1 lowercase letter, 1 number and a special character");
+                $"\nit needs at least 1 uppercase letter, 1 lowercase letter, 1 number and a special character\n");
             return GetValidPassword();
         }
 

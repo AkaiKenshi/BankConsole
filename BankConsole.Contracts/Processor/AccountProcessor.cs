@@ -13,9 +13,10 @@ public static class AccountProcessor
         var request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.Add("Authorization", $"bearer {token}");
 
-        using HttpResponseMessage respone = await ApiHelper.ApiClient.SendAsync(request);
-        respone.EnsureSuccessStatusCode();  
-        return await respone.Content.ReadAsAsync<Account>();
+        using HttpResponseMessage response = await ApiHelper.ApiClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadAsAsync<Account>();
     }
 
     public async static Task<List<Account>> GetAccountsAsync(string token)
@@ -38,7 +39,7 @@ public static class AccountProcessor
 
         using HttpResponseMessage response = await ApiHelper.ApiClient.SendAsync(request); 
         response.EnsureSuccessStatusCode();
-        return await request.Content.ReadAsAsync<Account>();
+        return await response.Content.ReadAsAsync<Account>();
     } 
 
     public async static Task TransactionBalanceAsync<T>(T updateRequest, string url, string token)
