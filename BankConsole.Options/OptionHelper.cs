@@ -38,13 +38,14 @@ public static class OptionHelper
 
     private static int GetUserSelection(int lenghtOption)
     {
+        Console.Write("-> ");
         var userInput = Console.ReadLine();
-        var numericUserInput = 0;
-        if (userInput == null || !int.TryParse(userInput, out numericUserInput) || numericUserInput > lenghtOption || numericUserInput <= 0)
+        if (userInput == null || !int.TryParse(userInput, out var numericUserInput) || numericUserInput > lenghtOption || numericUserInput <= 0)
         {
-            Console.WriteLine("Please Select a valid Option");
+            Console.WriteLine("Please Select a valid Option\n");
             return GetUserSelection(lenghtOption);
         }
+        Console.WriteLine();
         return numericUserInput;
     }
 }

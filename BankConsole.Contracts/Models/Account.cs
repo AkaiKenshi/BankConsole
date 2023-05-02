@@ -4,7 +4,6 @@ namespace BankConsole.Contracts.Models;
 
 public class Account
 {
-    [MaxLength(10)]
     public string Id { get; set; } = null!;
     public double Balance { get; set; }
     public AccountType AccountType { get; set; }
