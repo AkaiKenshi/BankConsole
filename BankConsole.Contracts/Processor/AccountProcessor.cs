@@ -7,6 +7,27 @@ namespace BankConsole.Contracts.Processor;
 
 public static class AccountProcessor
 {
+
+    public async static Task<bool> GetAccountExists(string accountId)
+    {
+        var url = $"/api/Account/checkAccountExists/{accountId}";
+
+        using HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadAsAsync<bool>();
+    }
+
+    public async static Task<Account> GetAccountFromIdAsync(string accountId)
+    {
+        var url = $"/api/Account/{accountId}";
+
+        using HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadAsAsync<Account>();
+    }
+
     public async static Task<Account> GetAccountFromIdAsync(string accountId, string token)
     {
         var url = $"/api/Account/{accountId}";
@@ -25,7 +46,7 @@ public static class AccountProcessor
         var request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.Add("Authorization", $"token {token}");
 
-        using HttpResponseMessage response = await ApiHelper.ApiClient.SendAsync(request); 
+        using HttpResponseMessage response = await ApiHelper.ApiClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsAsync<List<Account>>();
     }
@@ -37,15 +58,15 @@ public static class AccountProcessor
         request.Headers.Add("Authorization", $"bearer {token}");
         request.Content = content;
 
-        using HttpResponseMessage response = await ApiHelper.ApiClient.SendAsync(request); 
+        using HttpResponseMessage response = await ApiHelper.ApiClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsAsync<Account>();
-    } 
+    }
 
     public async static Task TransactionBalanceAsync<T>(T updateRequest, string url, string token)
     {
         var content = new StringContent(JsonConvert.SerializeObject(updateRequest), Encoding.UTF8, "application/json");
-        var request = new HttpRequestMessage(HttpMethod.Post, url);
+        var request = new HttpRequestMessage(HttpMethod.Put, url);
         request.Headers.Add("Authorization", $"bearer {token}");
         request.Content = content;
 

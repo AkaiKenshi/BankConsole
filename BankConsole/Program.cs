@@ -24,7 +24,7 @@ internal class Program
                         "Select a Option",
                         new ActionCommand("Create User Account", () => CreateUserAccount()),
                         new ActionCommand("LogIn to User Account", () => LogInUserAccount()),
-                        new ActionCommand("Pass Time", () => throw new NotImplementedException()),
+                        new ActionCommand("Pass Time", () => PassTime()),
                         new ActionCommand("Exit Application", () => KeepRunningApp = false));
             }
             catch (OperationCanceledException) { Console.WriteLine("returning to start..."); }
@@ -44,7 +44,7 @@ internal class Program
 
             Console.WriteLine($"\nWelcome {customer.FirstName} {customer.LastName}\n");
 
-            AccessAccount(customer);
+            AccountOptions(customer);
         }
         catch (AggregateException ex)
         {
@@ -70,9 +70,9 @@ internal class Program
 
         Console.WriteLine($"\nWelcome {customer.FirstName} {customer.LastName}\n");
 
-        AccessAccount(customer);
+        AccountOptions(customer);
     }
-    private static void AccessAccount(Customer customer)
+    private static void AccountOptions(Customer customer)
     {
         var KeepRunning = true;
         while (KeepRunning)
@@ -96,23 +96,25 @@ internal class Program
 
         Console.WriteLine($"\nAccount {account.Id} created with balance: {account.Balance:C}\n");
 
+        AccountActions(customer, account);
+
         Account chekingAccount()
         {
-            var moneyAmmounut = GetValidAmmountOfMoney("Enter the initial balance: ", "invalid Balance");
+            var moneyAmmounut = GetValidAmountOfMoney("Enter the initial balance: ", "invalid Balance");
             var createRequest = new CreateCheckingAccountRequestDTO(moneyAmmounut);
             return AccountProcessor.
                 CreateAccountAsync<CreateCheckingAccountRequestDTO>(createRequest, "/api/Account/createCheckingAccount", customer.Token).Result;
         }
         Account savingsAccount()
         {
-            var moneyAmmounut = GetValidAmmountOfMoney("Enter the initial balance: ", "invalid Balance");
+            var moneyAmmounut = GetValidAmountOfMoney("Enter the initial balance: ", "invalid Balance");
             var createRequest = new CreateSavingsAccountRequestDTO(moneyAmmounut);
             return AccountProcessor.
                 CreateAccountAsync<CreateSavingsAccountRequestDTO>(createRequest, "/api/Account/createSavingsAccount", customer.Token).Result;
         }
         Account longTermInvestmentAccount()
         {
-            var moneyAmmounut = GetValidAmmountOfMoney("Enter the initial balance: ", "invalid Balance");
+            var moneyAmmounut = GetValidAmountOfMoney("Enter the initial balance: ", "invalid Balance");
             var timeAmmounnt = GetValidAmmountOfTime("Enter the term: ", "invalid Term");
             var createRequest = new CreateSavingsAccountRequestDTO(moneyAmmounut);
             return AccountProcessor.
@@ -128,6 +130,7 @@ internal class Program
 
             Console.WriteLine($"\nAccess to account {account.Id} granted, balance: {account.Balance:C}\n");
 
+            AccountActions(customer, account);
         }
         catch (AggregateException ex)
         {
@@ -141,14 +144,27 @@ internal class Program
     }
     private static void AccountActions(Customer customer, Account account)
     {
-
+        var keepGoing = true;
+        while (keepGoing) {
+            OptionHelper.RunActionCommand(
+                "What would you like to do: ",
+                new ActionCommand("Deposit Money", () => DepositMoney(customer, account)), 
+                new ActionCommand("Withdraw Money",  () => WithdrawMoney(customer, account)),
+                new ActionCommand("Transfer Money", () => TransferMoney(customer, account)),
+                new ActionCommand("Exit", () => keepGoing = false));
+        }
     }
-
     private static void DepositMoney(Customer customer, Account account)
     {
         try
         {
-            //AccountProcessor.TransactionBalanceAsync()
+            var url = "/api/Account/UpdateDepositBalance";
+            var money = GetValidAmountOfMoney("Enter Deposit amount: ", "Invalid Amount");
+            var depoistDto = new UpdateDepositBalanceRequestDTO(account.Id, money);
+            AccountProcessor.TransactionBalanceAsync(depoistDto, url, customer.Token).Wait();
+            account.Balance += money;
+
+            Console.WriteLine($"\nSuccessful deposit the new balance is {account.Balance:C}\n");
         }
         catch (AggregateException ex)
         {
@@ -157,7 +173,50 @@ internal class Program
 
         }
     }
+    private static void WithdrawMoney(Customer customer, Account account)
+    {
+        try
+        {
+            var url = "/api/Account/UpdateWithdrawBalance";
+            var money = GetValidAmountOfMoney("Enter Withdraw amount: ", "Invalid Amount");
+            var depoistDto = new UpdateWithdrawBalanceRequestDTO(account.Id, money);
+            AccountProcessor.TransactionBalanceAsync(depoistDto, url, customer.Token).Wait();
+            account.Balance -= money;
 
+            Console.WriteLine($"\nSuccessful withdraw the new balance is {account.Balance:C}\n");
+        }
+        catch (AggregateException ex)
+        {
+            if (ex.InnerException is not HttpRequestException) { throw ex.InnerException!; }
+            Console.WriteLine(ex.InnerException.Message);
+
+        }
+    }
+    private static void TransferMoney(Customer customer, Account account)
+    {
+        try
+        {
+            var url = "/api/Account/UpdateTransferBalance";
+            var money = GetValidAmountOfMoney("Enter Transfer amount: ", "Invalid Amount");
+            var targetAccount = GetValidAccount("Enter Target Account: ", "Invalid Account");
+            var depoistDto = new UpdateTransferBalanceRequestDTO(account.Id, targetAccount, money);
+            AccountProcessor.TransactionBalanceAsync(depoistDto, url, customer.Token).Wait();
+            account.Balance -= money;
+
+            Console.WriteLine($"\nSuccessful transfer the new balance is {account.Balance:C}\n");
+        }
+        catch (AggregateException ex)
+        {
+            if (ex.InnerException is not HttpRequestException) { throw ex.InnerException!; }
+            Console.WriteLine(ex.InnerException.Message);
+
+        }
+    }
+    private static void PassTime()
+    {
+        var time = GetValidAmmountOfTime("Time to Pass: ", "Invalid amount");
+        TimeProcessor.PassTime(time).Wait();  
+    }
     #region HelperFunctions
     private static string GetUserInput(string promnt, string promntOnFail)
     {
@@ -241,19 +300,19 @@ internal class Program
 
         return password;
     }
-    public static double GetValidAmmountOfMoney(string promt, string promtOnFaliure)
+    public static double GetValidAmountOfMoney(string promt, string promtOnFaliure)
     {
         if (!Double.TryParse(GetUserInput(promt, promtOnFaliure), out var result) || result < 0)
         {
             Console.WriteLine(promtOnFaliure);
-            return GetValidAmmountOfMoney(promt, promtOnFaliure);
+            return GetValidAmountOfMoney(promt, promtOnFaliure);
         }
         var stringResult = result.ToString();
         int decimalPlaces = stringResult.Length - stringResult.IndexOf('.') - 1;
-        if (decimalPlaces > 2)
+        if (decimalPlaces > 2 && stringResult.Contains('.'))
         {
             Console.WriteLine(promtOnFaliure);
-            return GetValidAmmountOfMoney(promt, promtOnFaliure);
+            return GetValidAmountOfMoney(promt, promtOnFaliure);
         }
         return result;
     }
@@ -287,6 +346,17 @@ internal class Program
 
 
         return password!;
+    }
+
+    private static string GetValidAccount(string promt, string promtOnFailure)
+    {
+        var account_id = GetUserInput(promt, promtOnFailure); 
+        if (!AccountProcessor.GetAccountExists(account_id).Result)
+        {
+            Console.WriteLine("Account does not exists"); 
+            GetValidAccount(promt, promtOnFailure);
+        }
+        return account_id;
     }
     #endregion
 }
