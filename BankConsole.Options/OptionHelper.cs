@@ -1,10 +1,8 @@
-﻿using System.Security.Cryptography.X509Certificates;
-
-namespace BankConsole.Options;
+﻿namespace BankConsole.Options;
 
 public static class OptionHelper
 {
-    public static void RunActionCommand(string initialPrompt, params ActionCommand[] options)
+    public static void RunCommand(string initialPrompt, params (string prompt, Action onSelected)[] options)
     {
         if (options == null || options.Length == 0)
         {
@@ -13,14 +11,13 @@ public static class OptionHelper
 
         Console.WriteLine(initialPrompt);
 
-        for (int i = 1; i <= options.Length; i++) Console.WriteLine("   " + i + ": " + options[i - 1].Prompt);
+        ShowOptions(options);
 
         var userInput = GetUserSelection(options.Length);
-        options[userInput - 1].RunCommand();
-
+        options[userInput - 1].onSelected();
     }
 
-    public static T RunFuncCommand<T>(string initialPrompt, params FuncCommand<T>[] options)
+    public static T RunCommand<T>(string initialPrompt, params (string prompt, Func<T> onSelected)[] options)
     {
         if (options == null || options.Length == 0)
         {
@@ -28,12 +25,15 @@ public static class OptionHelper
         }
 
         Console.WriteLine(initialPrompt);
-
-        for (int i = 1; i <= options.Length; i++) Console.WriteLine("   " + i + ": " + options[i - 1].Prompt);
+        ShowOptions(options);
 
         var userInput = GetUserSelection(options.Length);
-        return options[userInput - 1].RunCommand();
+        return options[userInput - 1].onSelected();
+    }
 
+    private static void ShowOptions<T>((string prompt, T onSelected)[] options)
+    {
+        for (int i = 1; i <= options.Length; i++) Console.WriteLine("   " + i + ": " + options[i - 1].prompt);
     }
 
     private static int GetUserSelection(int lenghtOption)

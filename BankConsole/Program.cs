@@ -20,14 +20,18 @@ internal class Program
         {
             try
             {
-                OptionHelper.RunActionCommand(
+                OptionHelper.RunCommand(
                         "Select a Option",
-                        new ActionCommand("Create User Account", () => CreateUserAccount()),
-                        new ActionCommand("LogIn to User Account", () => LogInUserAccount()),
-                        new ActionCommand("Pass Time", () => PassTime()),
-                        new ActionCommand("Exit Application", () => KeepRunningApp = false));
+                        ("Create User Account", () => CreateUserAccount()),
+                        ("LogIn to User Account", () => LogInUserAccount()),
+                        ("Pass Time", () => PassTime()),
+                        ("Exit Application", () => KeepRunningApp = Confirmate()));
             }
             catch (OperationCanceledException) { Console.WriteLine("returning to start..."); }
+
+            static bool Confirmate() => OptionHelper.RunCommand("Are you sure you want to exit the application", 
+                ("Yes", () => false),
+                ("No", () => true));
         }
     }
 
@@ -77,22 +81,21 @@ internal class Program
         var KeepRunning = true;
         while (KeepRunning)
         {
-            OptionHelper.RunActionCommand(
+            OptionHelper.RunCommand(
                 "Would you like to: ",
-                new ActionCommand("Create New Bank Account", () => CreateBankAccount(customer)),
-                new ActionCommand("Access Bank Account", () => AccessBankAccount(customer)),
-                new ActionCommand("Go back", () => KeepRunning = false));
+                ("Create New Bank Account", () => CreateBankAccount(customer)),
+                ("Access Bank Account", () => AccessBankAccount(customer)),
+                ("Go back", () => KeepRunning = false));
         }
     }
     private static void CreateBankAccount(Customer customer)
     {
 
-        var account = OptionHelper.RunFuncCommand(
+        var account = OptionHelper.RunCommand(
             "What Type of account would you like to create",
-            new FuncCommand<Account>("Checking Account", () => chekingAccount()),
-            new FuncCommand<Account>("Savings Account", () => savingsAccount()),
-            new FuncCommand<Account>("Fixed Term Investment Account", () => longTermInvestmentAccount())
-            );
+            ("Checking Account", () => chekingAccount()),
+            ("Savings Account", () => savingsAccount()),
+            ("Fixed Term Investment Account", () => longTermInvestmentAccount()));
 
         Console.WriteLine($"\nAccount {account.Id} created with balance: {account.Balance:C}\n");
 
@@ -146,12 +149,12 @@ internal class Program
     {
         var keepGoing = true;
         while (keepGoing) {
-            OptionHelper.RunActionCommand(
+            OptionHelper.RunCommand(
                 "What would you like to do: ",
-                new ActionCommand("Deposit Money", () => DepositMoney(customer, account)), 
-                new ActionCommand("Withdraw Money",  () => WithdrawMoney(customer, account)),
-                new ActionCommand("Transfer Money", () => TransferMoney(customer, account)),
-                new ActionCommand("Exit", () => keepGoing = false));
+                ("Deposit Money", () => DepositMoney(customer, account)), 
+                ("Withdraw Money",  () => WithdrawMoney(customer, account)),
+                ("Transfer Money", () => TransferMoney(customer, account)),
+                ("Exit", () => keepGoing = false));
         }
     }
     private static void DepositMoney(Customer customer, Account account)
@@ -242,10 +245,10 @@ internal class Program
         else if (!CustomerProcessor.IsCustomerIdAvailableAsync(userInput).Result)
         {
             Console.WriteLine("invalid Id or already taken");
-            return OptionHelper.RunFuncCommand(
+            return OptionHelper.RunCommand(
                 "Try Again",
-                new FuncCommand<string>("Yes", () => GetAvailableId()),
-                new FuncCommand<string>("No", () => throw new OperationCanceledException()));
+                ("Yes", () => GetAvailableId()),
+                ("No", () => throw new OperationCanceledException()));
         }
 
         return userInput;
@@ -256,10 +259,10 @@ internal class Program
         if (!CustomerProcessor.IsCustomerUsernameAvailableAsync(userInput).Result)
         {
             Console.WriteLine("Invalid username or already taken");
-            return OptionHelper.RunFuncCommand(
+            return OptionHelper.RunCommand(
                 "Try Again",
-                new FuncCommand<string>("Yes", () => GetAvailableUsername()),
-                new FuncCommand<string>("No", () => throw new OperationCanceledException()));
+                ("Yes", () => GetAvailableUsername()),
+                ("No", () => throw new OperationCanceledException()));
         }
         return userInput;
     }
@@ -269,10 +272,10 @@ internal class Program
         if (!CustomerProcessor.IsCustomerUsernameAvailableAsync(userInput).Result)
         {
             Console.WriteLine("Invalid Email or already taken");
-            return OptionHelper.RunFuncCommand(
+            return OptionHelper.RunCommand(
                 "Try Again",
-                new FuncCommand<string>("Yes", () => GetAvailableEmail()),
-                new FuncCommand<string>("No", () => throw new OperationCanceledException()));
+                ("Yes", () => GetAvailableEmail()),
+                ("No", () => throw new OperationCanceledException()));
         }
         return userInput;
     }
